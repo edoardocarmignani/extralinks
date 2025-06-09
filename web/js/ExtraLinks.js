@@ -35,12 +35,43 @@ const LinkRenderers = {
                 pos[1] = (y2 + y1) * 0.5;
             }
         }
+    },
+    rounded: {
+        draw: function(ctx, start, end, radius, color, width) {
+            const x0 = start[0];
+            const y1 = start[1];
+            const x2 = end[0];
+            const y2 = end[1];
+
+            const dx = x2 - x0;
+            const dy = y2 - y1;
+
+            const dirX = Math.sign(dx);
+            const dirY = Math.sign(dy);
+
+            const r = Math.min(radius, Math.abs(dx * 0.5), Math.abs(dy * 0.5));
+
+            ctx.save();
+            ctx.lineWidth = width;
+            ctx.strokeStyle = color;
+            ctx.beginPath();
+
+            ctx.moveTo(x0, y1);
+            ctx.lineTo(midX - r * dirX, y1);
+            ctx.arcTo(midX, y1, midX, y1 + r * dirY, r);
+            ctx.lineTo(midX, y2 - r * dirY);
+            ctx.arcTo(midX, y2, midX + r * dirX, y2, r);
+            ctx.lineTo(x2, y2);
+
+            ctx.stroke();
+            ctx.restore();
+        }
     }
 };
 
 export class ExtraLinks {
     init() {
-
+        console.log("ExtraLinks Initialized")
         const RADIUS    = 10;
         const OFFSET    = 25;
         const CURVATURE = 5;
