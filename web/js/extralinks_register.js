@@ -1,15 +1,6 @@
 import {app} from "../../../scripts/app.js"
 import { ExtraLinks } from "./ExtraLinks.js"
 
-function repaintAll() {
-    const canvas = app.graph?.canvas;
-    if (canvas) {
-        if (canvas.renderedPaths) canvas.renderedPaths.clear();
-        canvas.setDirty(true, true);
-        canvas.draw(true, true);
-    }
-}
-
 app.registerExtension({
     name: "Extra Links",
     settings: [
