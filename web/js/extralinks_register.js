@@ -9,21 +9,36 @@ app.registerExtension({
             name: "Offset",
             type: "slider",
             defaultValue: 25,
-            category: ["Extra Links", "Curved", "Offset"]
+            category: ["Extra Links", "Curved", "Offset"],
+            onChange: (...args) => {
+                const exl = new ExtraLinks();
+                exl.init();
+                app.graph?.change.apply(app.graph, args);
+            }
         },
         {
             id: "Extra Links.Curvature",
             name: "Curvature",
             type: "slider",
             defaultValue: 5,
-            category: ["Extra Links", "Curved", "Curvature"]
+            category: ["Extra Links", "Curved", "Curvature"],
+            onChange: (...args) => {
+                const exl = new ExtraLinks();
+                exl.init();
+                app.graph?.change.apply(app.graph, args);
+            }
         },
         {
             id: "Extra Links.Radius",
             name: "Radius",
             type: "slider",
             defaultValue: 10,
-            category: ["Extra Links", "Curved", "Radius"]
+            category: ["Extra Links", "Curved", "Radius"],
+            onChange: (...args) => {
+                const exl = new ExtraLinks();
+                exl.init();
+                app.graph?.change.apply(app.graph, args);
+            }
         },
         {
             id: "Extra Links.Extra Links",
@@ -53,14 +68,14 @@ app.registerExtension({
                 return container;
             },
             defaultValue: 10,
-            category: ["Extra Links", "Extra Links", "Version"]
+            category: ["Extra Links", "a. Extra Links", " Version"]
         },
         {
             id: "Extra Links.Enable",
             name: "Enable",
             type: "boolean",
             defaultValue: true,
-            category: ["Extra Links", "Extra Links", "Enable"],
+            category: ["Extra Links", "a. Extra Links", "Enable"],
             onChange: (...args) => {
                 const exl = new ExtraLinks();
                 exl.init();
