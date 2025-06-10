@@ -1,0 +1,31 @@
+name: "💡 Feature Request"
+description: Create a new ticket for a new feature request
+title: "💡 [REQUEST] - <title>"
+labels: [
+  "enhancement"
+]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: "📌 Summary"
+      description: Provide a brief explanation of the feature
+      placeholder: Describe in a few lines your feature request
+    validations:
+      required: true
+  - type: textarea
+    id: reason
+    attributes:
+      label: "❓ It should implemented because"
+      description: Indicate here why this feature should be added.
+      placeholder: A few specific words about your feature request.
+    validations:
+      required: false
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: "➕ Additional context"
+      description: Add additional context and/or screenshots about the feature.
+      placeholder: Add any other context or screenshot here.
+    validations:
+      required: false
