@@ -29,14 +29,28 @@ app.registerExtension({
             id: "Extra Links.Extra Links",
             name: "Version 0.0.1",
             type: () => {
-                const x = document.createElement('span')
-                const a = document.createElement('a')
-                a.innerText = "Report issues or request features"
-                a.href = "https://github.com/edoardocarmignani/extralinks/issues"
-                a.target = "_blank"
-                a.style.paddingRight = "12px"
-                x.appendChild(a)
-                return x
+                const container = document.createElement("span");
+                const btn = document.createElement("button");
+                btn.innerText = "Issues / Features";
+                btn.style.padding = "6px 12px";
+                btn.style.cursor = "pointer";
+                btn.style.backgroundColor = "#007bff";
+                btn.style.color = "#f0f0f0";
+                btn.style.border = "none";
+                btn.style.borderRadius = "4px";
+                btn.style.boxShadow = "0 2px 2px rgba(0,0,0,0.2)";
+                btn.style.fontWeight = "bold";
+                btn.style.fontFamily = "Helvetica, sans-serif"
+                btn.addEventListener("click", () => {
+                    window.open(
+                    "https://github.com/edoardocarmignani/extralinks/issues",
+                    "_blank",
+                    "noopener"
+                    );
+                });
+
+                container.appendChild(btn);
+                return container;
             },
             defaultValue: 10,
             category: ["Extra Links", "Extra Links", "Version"]
