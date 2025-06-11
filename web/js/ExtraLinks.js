@@ -2,7 +2,7 @@ import {app} from "../../../scripts/app.js"
 
 const LinkRenderers = {
     curved: {
-        draw: function(path, start, end, slot_id, outputs, radius, offset, curvature, color, width, pos) {
+        draw: function(path, start, end, slot_id, outputs, radius, offset, curvature, pos) {
             const x0 = start[0];
             const y1 = start[1];
             const x2 = end[0];
@@ -18,7 +18,7 @@ const LinkRenderers = {
             const oX = Math.min(offsetX, (dx * 0.5))
             const x1 = x0 + oX;
 
-            const r = Math.min(radius, Math.abs(dx * 0.5), Math.abs(dy * 0.5));
+            const r = Math.min(radius, Math.abs(dx * 0.5), Math.abs(dy * 0.5), Math.abs(x0 - x1));
 
             path.moveTo(x0, y1);
             path.lineTo(x1 - r * dirX, y1);
@@ -37,7 +37,7 @@ const LinkRenderers = {
         }
     },
     rounded: {
-        draw: function(ctx, start, end, radius, color, width) {
+        draw: function(path, start, end, slot_id, outputs, radius, offset, curvature, pos) {
             const x0 = start[0];
             const y1 = start[1];
             const x2 = end[0];
@@ -49,32 +49,31 @@ const LinkRenderers = {
             const dirX = Math.sign(dx);
             const dirY = Math.sign(dy);
 
-            const r = Math.min(radius, Math.abs(dx * 0.5), Math.abs(dy * 0.5));
+            const offsetX = Math.max((offset * (outputs > 1 ? Math.log(outputs) : 1) - slot_id * curvature) * dirX, 0);
+            const oX = Math.min(offsetX, (dx * 0.5))
+            const x1 = x0 + oX;
+            const midx = (x2 + x1) * 0.5;
 
-            ctx.save();
-            ctx.lineWidth = width;
-            ctx.strokeStyle = color;
-            ctx.beginPath();
+            const r = Math.min(radius, Math.abs(dy * 0.5));
 
-            ctx.moveTo(x0, y1);
-            ctx.lineTo(midX - r * dirX, y1);
-            ctx.arcTo(midX, y1, midX, y1 + r * dirY, r);
-            ctx.lineTo(midX, y2 - r * dirY);
-            ctx.arcTo(midX, y2, midX + r * dirX, y2, r);
-            ctx.lineTo(x2, y2);
+            path.moveTo(x0, y1);
+            path.lineTo(midx - r * dirX, y1);
+            path.arcTo(midx, y1, midx, y1 + r * dirY, r);
+            path.lineTo(midx, y2 - r * dirY);
+            path.arcTo(midx, y2, midx + r * dirX, y2, r);
+            path.lineTo(x2, y2);
 
-            ctx.stroke();
-            ctx.restore();
+            pos[0] = midx;
+            pos[1] = (y2 + y1) * 0.5;
         }
     }
 };
 
 export class ExtraLinks {
     init() {
-        console.log("ExtraLinks Initialized")
-        const RADIUS    = 10;
-        const OFFSET    = 25;
-        const CURVATURE = 5;
+        const RADIUS    = app.extensionManager.setting.get("Extra Links.Shapes.Radius") ?? 10;
+        const OFFSET    = app.extensionManager.setting.get("Extra Links.Shapes.Offset") ?? 25;
+        const CURVATURE = app.extensionManager.setting.get("Extra Links.Shapes.Curvature") ?? 5;
 
         const _oldRenderLink = LGraphCanvas.prototype.renderLink;
 
@@ -86,10 +85,11 @@ export class ExtraLinks {
             disabled = false
         } = {}) {
 
-            if (!app.extensionManager.setting.get("Extra Links.Enable")) {
+            if (!app.extensionManager.setting.get("Extra Links.General.Enable")) {
                 LGraphCanvas.prototype.renderLink = _oldRenderLink;
                 return;
             };
+
             const linkColour = link2 != null && this.highlighted_links[link2.id] ? "#FFF" : color2 || link2?.color || link2?.type != null && LGraphCanvas.link_type_colors[link2.type] || this.default_link_color;
             ctx.lineJoin = "round";
             num_sublines ||= 1;
@@ -103,8 +103,7 @@ export class ExtraLinks {
             const total_outputs = start_node?.outputs.length ?? 1;
             for (let i2 = 0; i2 < num_sublines; i2++) {
 
-                LinkRenderers["curved"].draw(path, a2, b2, outputId, total_outputs, RADIUS, OFFSET, CURVATURE, linkColour,
-                    this.connections_width, pos);
+                LinkRenderers[app.extensionManager.setting.get("Extra Links.General.Shape")].draw(path, a2, b2, outputId, total_outputs, RADIUS, OFFSET, CURVATURE, pos);
 
             }
 
