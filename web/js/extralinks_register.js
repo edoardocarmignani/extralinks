@@ -81,7 +81,7 @@ app.registerExtension({
             options: [{text: "Curved", value: "curved"},
                       {text: "Rounded", value: "rounded"}],
             defaultValue: "curved",
-            category: ["Extra Links", "a. General", "Shape"],
+            category: ["Extra Links", "General", "Shape"],
             onChange: (val) => {
                 const exl = new ExtraLinks();
                 exl.init();
@@ -93,7 +93,7 @@ app.registerExtension({
             name: "Enable",
             type: "boolean",
             defaultValue: true,
-            category: ["Extra Links", "a. General", "Enable"],
+            category: ["Extra Links", "General", "Enable"],
             onChange: (...args) => {
                 const exl = new ExtraLinks();
                 exl.init();
