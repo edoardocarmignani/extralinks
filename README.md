@@ -1,6 +1,12 @@
-# Extra Links
+<div align="center">
+    <img src="imgs/extralinks_logo.png">
+</div>
+
+
 
 A one-click collection of alternate connection styles for ComfyUI.
+
+------------------------------------------------------------------
 
 ## Quickstart
 
