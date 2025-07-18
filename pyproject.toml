@@ -1,6 +1,6 @@
 [project]
 name = "extralinks"
-version = "0.0.1"
+version = "0.0.2"
 description = "More connection links."
 authors = [
   {name = "Edoardo Carmignani", email = "edoardo.carmignani@gmail.com"}
@@ -15,9 +15,10 @@ dependencies = [
 [project.urls]
 bugs = "https://github.com/edoardocarmignani/extralinks/issues"
 homepage = "https://github.com/edoardocarmignani/extralinks"
+Repository = "https://github.com/edoardocarmignani/extralinks"
 
 
 [tool.comfy]
 PublisherId = "edoardocarmignani"
-DisplayName = "Extra Links"
+DisplayName = "ComfyUI-ExtraLinks"
 Icon = ""
