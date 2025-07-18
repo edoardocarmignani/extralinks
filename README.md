@@ -9,8 +9,8 @@ A one-click collection of alternate connection styles for ComfyUI.
 ------------------------------------------------------------------
 
 <div align="center">
-    <img width=400 src="imgs/curved.png">
-    <img width=400 src="imgs/rounded.png">
+    <img width=400 height=190 src="imgs/curved.png">
+    <img width=400 height=190 src="imgs/rounded.png">
 </div>
 
 <div align="center">
