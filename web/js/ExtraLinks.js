@@ -3,10 +3,10 @@ import {app} from "../../../scripts/app.js"
 const LinkRenderers = {
     curved: {
         draw: function(path, start, end, slot_id, outputs, radius, offset, curvature, pos) {
-            const x0 = start[0];
-            const y1 = start[1];
-            const x2 = end[0];
-            const y2 = end[1];
+            const x0 = start.x;
+            const y1 = start.y;
+            const x2 = end.x;
+            const y2 = end.y;
 
             const dx = x2 - x0;
             const dy = y2 - y1;
@@ -38,10 +38,10 @@ const LinkRenderers = {
     },
     rounded: {
         draw: function(path, start, end, slot_id, outputs, radius, offset, curvature, pos) {
-            const x0 = start[0];
-            const y1 = start[1];
-            const x2 = end[0];
-            const y2 = end[1];
+            const x0 = start.x;
+            const y1 = start.y;
+            const x2 = end.x;
+            const y2 = end.y;
 
             const dx = x2 - x0;
             const dy = y2 - y1;
@@ -70,52 +70,79 @@ const LinkRenderers = {
 };
 
 export class ExtraLinks {
+
+    constructor() {
+        this.isPatched = false;
+    }
+
     init() {
-        const RADIUS    = app.extensionManager.setting.get("Extra Links.Shapes.Radius") ?? 10;
-        const OFFSET    = app.extensionManager.setting.get("Extra Links.Shapes.Offset") ?? 25;
-        const CURVATURE = app.extensionManager.setting.get("Extra Links.Shapes.Curvature") ?? 5;
+        this.waitForCanvas().then(() => {
+            this.patchDrawLinkPath();
+            console.log("✅ Extra Links Loaded");
+        });
+    }
 
-        const _oldRenderLink = LGraphCanvas.prototype.renderLink;
+    async waitForCanvas() {
+        while (!app.canvas ||
+               !app.canvas.linkRenderer ||
+               !app.canvas.linkRenderer.pathRenderer ||
+               !app.canvas.linkRenderer.pathRenderer.drawLink) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        return true;
+    }
 
-        LGraphCanvas.prototype.renderLink = function renderLink(ctx, a2, b2, link2, skip_border, flow, color2, start_dir, end_dir, {
-            startControl,
-            endControl,
-            reroute,
-            num_sublines = 1,
-            disabled = false
-        } = {}) {
+    patchDrawLinkPath() {
+
+        const pathRenderer = app.canvas.linkRenderer.pathRenderer;
+        const _originalDrawLinkPath = pathRenderer.drawLinkPath;
+        const _originalCalculateCenterPoint = pathRenderer.calculateCenterPoint;
+
+        pathRenderer.drawLinkPath = function drawLinkPath(ctx, path, link2, context, lineWidth, color2) {
 
             if (!app.extensionManager.setting.get("Extra Links.General.Enable")) {
-                LGraphCanvas.prototype.renderLink = _oldRenderLink;
+                pathRenderer.drawLinkPath = _originalDrawLinkPath;
+                pathRenderer.calculateCenterPoint = _originalCalculateCenterPoint;
                 return;
-            };
-
-            const linkColour = link2 != null && this.highlighted_links[link2.id] ? "#FFF" : color2 || link2?.color || link2?.type != null && LGraphCanvas.link_type_colors[link2.type] || this.default_link_color;
-            ctx.lineJoin = "round";
-            num_sublines ||= 1;
-            if (num_sublines > 1) ctx.lineWidth = 0.5;
-            const linkSegment = reroute ?? link2;
-            const path = new Path2D();
-            if (linkSegment) linkSegment.path = path;
-            const pos = linkSegment?._pos ?? [0, 0];
-            const outputId = link2?.origin_slot ?? 0;
-            const start_node = this.graph.getNodeById(link2?.origin_id);
-            const total_outputs = start_node?.outputs.length ?? 1;
-            for (let i2 = 0; i2 < num_sublines; i2++) {
-
-                LinkRenderers[app.extensionManager.setting.get("Extra Links.General.Shape")].draw(path, a2, b2, outputId, total_outputs, RADIUS, OFFSET, CURVATURE, pos);
-
             }
 
-            ctx.lineWidth = this.connections_width;
-            ctx.fillStyle = ctx.strokeStyle = linkColour;
+            const RADIUS    = app.extensionManager.setting.get("Extra Links.Shapes.Radius") ?? 10;
+            const OFFSET    = app.extensionManager.setting.get("Extra Links.Shapes.Offset") ?? 25;
+            const CURVATURE = app.extensionManager.setting.get("Extra Links.Shapes.Curvature") ?? 5;
+            const SHAPE = app.extensionManager.setting.get("Extra Links.General.Shape") ?? "curved";
+
+            const outputId = link2?.origin_slot ?? 0;
+            const start_node = app.graph.getNodeById(link2?.origin_id);
+            const total_outputs = start_node?.outputs.length ?? 1;
+
+            const startPos = link2.startPoint;
+            const endPos = link2.endPoint;
+
+            ctx.lineJoin = "round";
+            ctx.lineWidth = lineWidth;
+            ctx.fillStyle = ctx.strokeStyle = color2;
+
+            const pos = [0, 0];
+
+            const renderer = LinkRenderers[SHAPE] || LinkRenderers.curved;
+
+            renderer.draw(
+                path,
+                startPos,
+                endPos,
+                outputId,
+                total_outputs,
+                RADIUS,
+                OFFSET,
+                CURVATURE,
+                pos
+            );
+
             ctx.stroke(path);
 
-            ctx.beginPath()
-            ctx.arc(pos[0], pos[1], 5, 0, Math.PI * 2);
-            ctx.fill();
+            pathRenderer.calculateCenterPoint = (...args) => {
+                return link2.centerPos = {x: pos[0], y: pos[1]}
+            }
         }
     }
 };
-
-
