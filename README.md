@@ -91,7 +91,7 @@ If issues persist, please open an issue with:
 
 - **1.0.0** — Migration to new ComfyUI link renderer (**breaking**: drops < 1.27.1).
 
-> See `CHANGELOG.md` for details.
+> See [`CHANGELOG`](CHANGELOG.md) for details.
 
 Tags:
 
@@ -127,7 +127,7 @@ if (!ok) {
 
 ## License
 
-MIT (see [LICENSE](LICENSE))
+MIT (see [`LICENSE`](LICENSE))
 
 ------------------------------------------------------------------
 
