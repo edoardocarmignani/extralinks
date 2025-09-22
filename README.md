@@ -2,6 +2,11 @@
     <img src="imgs/extralinks_logo.png">
 </div><br>
 
+![GitHub Tag](https://img.shields.io/github/v/tag/edoardocarmignani/extralinks?label=version)
+![GitHub License](https://img.shields.io/github/license/edoardocarmignani/extralinks)
+![Last Commit](https://img.shields.io/github/last-commit/edoardocarmignani/extralinks)
+![Issues](https://img.shields.io/github/issues/edoardocarmignani/extralinks)
+
 A one-click collection of alternate connection styles for ComfyUI.
 
 ------------------------------------------------------------------
