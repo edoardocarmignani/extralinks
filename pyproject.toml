@@ -1,6 +1,6 @@
 [project]
 name = "extralinks"
-version = "1.0.0"
+version = "1.0.1"
 description = "More connection links."
 authors = [
   {name = "Edoardo Carmignani", email = "edoardo.carmignani@gmail.com"}
@@ -21,4 +21,4 @@ Repository = "https://github.com/edoardocarmignani/extralinks"
 [tool.comfy]
 PublisherId = "edoardocarmignani"
 DisplayName = "ComfyUI-ExtraLinks"
-Icon = "https://raw.githubusercontent.com/edoardocarmignani/extralinks/refs/heads/main/imgs/extralinks_square_logo.png"
+Icon = "https://raw.githubusercontent.com/edoardocarmignani/extralinks/refs/heads/main/imgs/extralinks_logo_square.png"

@@ -111,7 +111,8 @@ export class ExtraLinks {
             const CURVATURE = app.extensionManager.setting.get("Extra Links.Shapes.Curvature") ?? 5;
             const SHAPE = app.extensionManager.setting.get("Extra Links.General.Shape") ?? "curved";
 
-            const outputId = link2?.origin_slot ?? 0;
+            const full_link_object = app.graph.links[link2?.id];
+            const outputId = full_link_object?.origin_slot ?? 0;
             const start_node = app.graph.getNodeById(link2?.origin_id);
             const total_outputs = start_node?.outputs.length ?? 1;
 
