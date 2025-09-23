@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [1.0.1] - 2025-09-23
+
+### Fixed
+
+- Safely resolve link objects when computing output slot and origin id: look up the link via `app.graph.links[linkId]` to access `origin_slot` and `origin_id`.
+- Corrected `Icon` URL in `pyproject.toml` to point to `imgs/extralinks_logo_square.png`.
+
+### Changed
+
+- Added/updated repository logo file `imgs/extralinks_logo_square.png` (ensure it's tracked in the repository).
+
+---
+
 ## [1.0.0] - 2025-09-20
 
 ### Changed
