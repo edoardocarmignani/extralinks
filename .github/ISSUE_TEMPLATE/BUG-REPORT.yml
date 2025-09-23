@@ -23,6 +23,12 @@ body:
         - Mac
     validations:
       required: true
+  - type: input
+    id: browser
+    attributes:
+      label: "Browser"
+      description: "Which browser are you using?"
+      placeholder: Chrome
   - type: textarea
     id: description
     attributes:
