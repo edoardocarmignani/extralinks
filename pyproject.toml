@@ -1,6 +1,6 @@
 [project]
 name = "extralinks"
-version = "1.0.0"
+version = "1.0.1"
 description = "More connection links."
 authors = [
   {name = "Edoardo Carmignani", email = "edoardo.carmignani@gmail.com"}
