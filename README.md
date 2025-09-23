@@ -39,11 +39,19 @@ cd ComfyUI\custom_nodes
 git clone https://github.com/edoardocarmignani/extralinks.git
 ```
 
-Restart ComfyUI (or just reload the browser tab if ComfyUI is already running).
+Restart ComfyUI.
 
 ### ComfyUI Manager
 
-Go to **Custom Nodes Manager** and search for **Extra Links**.
+Go to **Custom Nodes Manager** and search for **Extra Links**, install and restart ComfyUI.
+
+### Comfy CLI
+
+```powershell
+comfy node install extralinks
+```
+
+Restart ComfyUI.
 
 ------------------------------------------------------------------
 
