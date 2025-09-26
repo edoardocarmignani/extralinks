@@ -95,7 +95,7 @@ export class ExtraLinks {
     patchDrawLinkPath() {
 
         const pathRenderer = app.canvas.linkRenderer.pathRenderer;
-        const pathRendererConstructor = pathRenderer.constructor
+        const pathRendererConstructor = pathRenderer.constructor;
         const _originalDrawLinkPath = pathRenderer.drawLinkPath;
         const _originalCalculateCenterPoint = pathRenderer.calculateCenterPoint;
 
