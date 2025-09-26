@@ -95,14 +95,15 @@ export class ExtraLinks {
     patchDrawLinkPath() {
 
         const pathRenderer = app.canvas.linkRenderer.pathRenderer;
+        const pathRendererConstructor = pathRenderer.constructor
         const _originalDrawLinkPath = pathRenderer.drawLinkPath;
         const _originalCalculateCenterPoint = pathRenderer.calculateCenterPoint;
 
-        pathRenderer.drawLinkPath = function drawLinkPath(ctx, path, link2, context, lineWidth, color2) {
+        pathRendererConstructor.prototype.drawLinkPath = function drawLinkPath(ctx, path, link2, context, lineWidth, color2) {
 
             if (!app.extensionManager.setting.get("Extra Links.General.Enable")) {
-                pathRenderer.drawLinkPath = _originalDrawLinkPath;
-                pathRenderer.calculateCenterPoint = _originalCalculateCenterPoint;
+                pathRendererConstructor.prototype.drawLinkPath = _originalDrawLinkPath;
+                pathRendererConstructor.prototype.calculateCenterPoint = _originalCalculateCenterPoint;
                 return;
             }
 
@@ -141,7 +142,7 @@ export class ExtraLinks {
 
             ctx.stroke(path);
 
-            pathRenderer.calculateCenterPoint = (...args) => {
+            pathRendererConstructor.prototype.calculateCenterPoint = (...args) => {
                 return link2.centerPos = {x: pos[0], y: pos[1]}
             }
         }
