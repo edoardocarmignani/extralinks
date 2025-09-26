@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [1.0.2] - 2025-09-26
+
+### Fixed
+
+- Change patched method from `app.canvas.linkRenderer.pathRenderer.drawLinkPath` to `app.canvas.linkRenderer.pathRenderer.constructor.prototype.drawLinkPath` in order to patch each instance instead of just the first one. ([#5](https://github.com/edoardocarmignani/extralinks/issues/5))
+- Store original prototype method to restore them when needed.
+
+---
+
 ## [1.0.1] - 2025-09-23
 
 ### Fixed
