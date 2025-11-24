@@ -79,7 +79,8 @@ app.registerExtension({
             name: "Shape",
             type: "combo",
             options: [{text: "Curved", value: "curved"},
-                      {text: "Rounded", value: "rounded"}],
+                      {text: "Rounded", value: "rounded"},
+                      {text: "Subway", value: "subway"}],
             defaultValue: "curved",
             category: ["Extra Links", "General", "Shape"],
             onChange: (val) => {

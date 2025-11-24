@@ -2,7 +2,10 @@ import {app} from "../../../scripts/app.js"
 
 const LinkRenderers = {
     curved: {
-        draw: function(path, start, end, slot_id, outputs, radius, offset, curvature, pos) {
+        draw: function(path, start, end, slot_id, start_node, end_node, radius, offset, curvature, pos) {
+
+            const outputs = start_node?.outputs.length ?? 1;
+
             const x0 = start.x;
             const y1 = start.y;
             const x2 = end.x;
@@ -37,7 +40,10 @@ const LinkRenderers = {
         }
     },
     rounded: {
-        draw: function(path, start, end, slot_id, outputs, radius, offset, curvature, pos) {
+        draw: function(path, start, end, slot_id, start_node, end_node, radius, offset, curvature, pos) {
+
+            const outputs = start_node?.outputs.length ?? 1;
+
             const x0 = start.x;
             const y1 = start.y;
             const x2 = end.x;
@@ -66,7 +72,90 @@ const LinkRenderers = {
             pos[0] = midx;
             pos[1] = (y2 + y1) * 0.5;
         }
-    }
+    },
+    subway: {
+        draw: function(path, start, end, slot_id, start_node, end_node, radius, offset, curvature, pos, is_dragging) {
+            const x0 = start.x;
+            const y0 = start.y;
+            const x2 = end.x;
+            const y2 = end.y;
+
+            const dx = x2 - x0;
+            const dy = y2 - y0;
+
+            const r = Math.min(radius || 10, offset);
+
+            if (!start_node) {
+                path.moveTo(x0, y0);
+                if (dx > offset * 2) {
+                    const midX = (x0 + x2) * 0.5;
+                    const availableSpace = (dx * 0.5);
+                    const diagDist = Math.max(0, Math.min(Math.abs(dy) * 0.5, availableSpace));
+
+                    const c1 = midX - diagDist;
+                    const c2 = midX + diagDist;
+
+                    path.arcTo(c1, y0, c2, y2, r);
+                    path.arcTo(c2, y2, x2, y2, r);
+                    path.lineTo(x2, y2);
+
+                } else {
+                    const turnX1 = x0 + offset;
+                    const turnX2 = x2 - offset;
+                    path.arcTo(turnX1, y0, turnX1, y2, r);
+                    path.arcTo(turnX1, y2, x2, y2, r);
+                    path.lineTo(x2, y2);
+                }
+                pos[0] = (x0 + x2) * 0.5; pos[1] = (y0 + y2) * 0.5;
+                return;
+            }
+
+            const trackGap = 10;
+            const trayPadding = 20;
+
+            path.moveTo(x0, y0);
+
+            if (dx > offset * 2) {
+                const midX = (x0 + x2) * 0.5;
+                const halfHeight = Math.abs(dy) * 0.5;
+                const availableSpace = (dx * 0.5) - offset;
+
+                const diagDist = Math.max(0, Math.min(halfHeight, availableSpace));
+
+                const c1 = midX - diagDist;
+                const c2 = midX + diagDist;
+
+                path.arcTo(c1, y0, c2, y2, r);
+
+                path.arcTo(c2, y2, x2, y2, r);
+
+                path.lineTo(x2, y2);
+
+                pos[0] = midX;
+                pos[1] = y0 + (dy * 0.5);
+            }
+
+            else {
+                const sourceBottom = start_node.pos[1] + start_node.size[1];
+                const targetBottom = end_node ? (end_node.pos[1] + end_node.size[1]) : y2;
+                const lowestPoint = Math.max(sourceBottom, targetBottom, y2);
+
+                const trayY = lowestPoint + trayPadding + (slot_id * trackGap);
+
+                const turnX1 = x0 + offset;
+                const turnX2 = x2 - offset;
+
+                path.arcTo(turnX1, y0, turnX1, trayY, r);
+                path.arcTo(turnX1, trayY, turnX2, trayY, r);
+                path.arcTo(turnX2, trayY, turnX2, y2, r);
+                path.arcTo(turnX2, y2, x2, y2, r);
+                path.lineTo(x2, y2);
+
+                pos[0] = (x0 + x2) / 2;
+                pos[1] = trayY;
+            }
+        }
+    },
 };
 
 export class ExtraLinks {
@@ -114,8 +203,14 @@ export class ExtraLinks {
 
             const full_link_object = app.graph.links[link2?.id];
             const outputId = full_link_object?.origin_slot ?? 0;
-            const start_node = app.graph.getNodeById(link2?.origin_id);
-            const total_outputs = start_node?.outputs.length ?? 1;
+
+            const start_node = app.graph.getNodeById(full_link_object?.origin_id);
+            const end_node = app.graph.getNodeById(full_link_object?.target_id);
+
+            // console.log(outputId)
+            // console.log(start_node)
+
+            console.log(start_node?.size)
 
             const startPos = link2.startPoint;
             const endPos = link2.endPoint;
@@ -133,7 +228,8 @@ export class ExtraLinks {
                 startPos,
                 endPos,
                 outputId,
-                total_outputs,
+                start_node,
+                end_node,
                 RADIUS,
                 OFFSET,
                 CURVATURE,
