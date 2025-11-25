@@ -2,7 +2,7 @@ import {app} from "../../../scripts/app.js"
 
 const LinkRenderers = {
     curved: {
-        draw: function(path, start, end, slot_id, start_node, end_node, radius, offset, curvature, pos) {
+        draw: function(path, start, end, slot_id, start_node, end_node, radius, offset, curvature, pos, is_dragging) {
 
             const outputs = start_node?.outputs.length ?? 1;
 
@@ -40,7 +40,7 @@ const LinkRenderers = {
         }
     },
     rounded: {
-        draw: function(path, start, end, slot_id, start_node, end_node, radius, offset, curvature, pos) {
+        draw: function(path, start, end, slot_id, start_node, end_node, radius, offset, curvature, pos, is_dragging) {
 
             const outputs = start_node?.outputs.length ?? 1;
 
@@ -58,18 +58,18 @@ const LinkRenderers = {
             const offsetX = Math.max((offset * (outputs > 1 ? Math.log(outputs) : 1) - slot_id * curvature) * dirX, 0);
             const oX = Math.min(offsetX, (dx * 0.5))
             const x1 = x0 + oX;
-            const midx = (x2 + x1) * 0.5;
+            const midX = (x2 + x1) * 0.5;
 
             const r = Math.min(radius, Math.abs(dy * 0.5));
 
             path.moveTo(x0, y1);
-            path.lineTo(midx - r * dirX, y1);
-            path.arcTo(midx, y1, midx, y1 + r * dirY, r);
-            path.lineTo(midx, y2 - r * dirY);
-            path.arcTo(midx, y2, midx + r * dirX, y2, r);
+            path.lineTo(midX - r * dirX, y1);
+            path.arcTo(midX, y1, midX, y1 + r * dirY, r);
+            path.lineTo(midX, y2 - r * dirY);
+            path.arcTo(midX, y2, midX + r * dirX, y2, r);
             path.lineTo(x2, y2);
 
-            pos[0] = midx;
+            pos[0] = midX;
             pos[1] = (y2 + y1) * 0.5;
         }
     },
@@ -80,12 +80,18 @@ const LinkRenderers = {
             const x2 = end.x;
             const y2 = end.y;
 
+            const start_node_pos = start_node.pos ?? [0, 0];
+            const start_node_size = start_node.size ?? [0, 0];
+
             const dx = x2 - x0;
             const dy = y2 - y0;
 
-            const r = Math.min(radius || 10, offset);
+            const r = Math.min(radius, offset);
 
-            if (!start_node) {
+            const midX = (x0 + x2) * 0.5;
+            const availableSpace = (dx * 0.5);
+
+            if (is_dragging && !start_node) {
                 path.moveTo(x0, y0);
                 if (dx > offset * 2) {
                     const midX = (x0 + x2) * 0.5;
@@ -207,10 +213,14 @@ export class ExtraLinks {
             const start_node = app.graph.getNodeById(full_link_object?.origin_id);
             const end_node = app.graph.getNodeById(full_link_object?.target_id);
 
+            const is_dragging = (link2?.id == 'temp') || !app.graph.links[link2.id];
+
             // console.log(outputId)
+            // console.log(link2)
             // console.log(start_node)
 
-            console.log(start_node?.size)
+            // console.log(start_node?.size)
+            console.log(is_dragging)
 
             const startPos = link2.startPoint;
             const endPos = link2.endPoint;
@@ -233,7 +243,8 @@ export class ExtraLinks {
                 RADIUS,
                 OFFSET,
                 CURVATURE,
-                pos
+                pos,
+                is_dragging
             );
 
             ctx.stroke(path);
