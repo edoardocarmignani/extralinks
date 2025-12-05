@@ -72,7 +72,6 @@ const LinkRenderers = {
                 pos[1] = trayY;
                 pos[2] = (turnX2 < turnX1) ? Math.PI : 0;
             }
-
         }
     },
     manhattan: {

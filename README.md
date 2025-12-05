@@ -12,7 +12,7 @@ A one-click collection of alternate connection styles for ComfyUI.
 ------------------------------------------------------------------
 
 <div align="center">
-    <img width=900 src="imgs/extralinks.png">
+    <img width=750 src="imgs/extralinks.png">
 </div>
 
 ------------------------------------------------------------------
@@ -20,13 +20,13 @@ A one-click collection of alternate connection styles for ComfyUI.
 Different types of **link connections** and **geometry awareness**.
 
 <div align="center">
-    <img width=300 src="imgs/curved.png">
-    <img width=300 src="imgs/manhattan.png">
-    <img width=300 src="imgs/subway.png">
+    <img width=250 src="imgs/curved.png">
+    <img width=250 src="imgs/manhattan.png">
+    <img width=250 src="imgs/subway.png">
 </div>
 
 <div align="center">
-    <img width=900 src="imgs/geometry_awareness_sample.gif">
+    <img width=750 src="imgs/geometry_awareness_sample.gif">
 </div>
 
 
