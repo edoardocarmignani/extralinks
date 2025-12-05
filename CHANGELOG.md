@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [1.1.0] - 2025-11-25
+
+### Added
+
+- **Subway link renderer**: New experimental subway-style link routing mode for organizing and visualizing complex node graphs with cleaner link paths.
+- Node geometry awareness: Links now consider node positions and sizes for improved spatial layout calculations.
+
+### Changed
+
+- Enhanced `ExtraLinks.js` with subway logic for alternative link path rendering.
+- Improved link path calculations to account for node geometry.
+
+### Notes
+
+- Subway mode is still under development and may require additional refinements. Feedback welcome!
+
+---
+
 ## [1.0.2] - 2025-09-26
 
 ### Fixed

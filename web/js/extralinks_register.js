@@ -24,7 +24,7 @@ app.registerExtension({
             category: ["Extra Links", "Shapes", "Curvature"],
             attrs: {
                 min: 0,
-                max: 20,
+                max: 10,
                 step: 0.5,
             },
             onChange: (...args) => {
@@ -47,7 +47,7 @@ app.registerExtension({
         },
         {
             id: "Extra Links.ExtraLinks",
-            name: "Version 1.0.2",
+            name: "Version 1.1.0",
             type: () => {
                 const container = document.createElement("span");
                 const btn = document.createElement("button");
@@ -79,7 +79,8 @@ app.registerExtension({
             name: "Shape",
             type: "combo",
             options: [{text: "Curved", value: "curved"},
-                      {text: "Rounded", value: "rounded"}],
+                      {text: "Manhattan", value: "manhattan"},
+                      {text: "Subway", value: "subway"}],
             defaultValue: "curved",
             category: ["Extra Links", "General", "Shape"],
             onChange: (val) => {

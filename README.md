@@ -12,15 +12,24 @@ A one-click collection of alternate connection styles for ComfyUI.
 ------------------------------------------------------------------
 
 <div align="center">
-    <img width=400 height=190 src="imgs/curved.png">
-    <img width=400 height=190 src="imgs/rounded.png">
-</div>
-
-<div align="center">
-    <img width=800 src="imgs/extralinks_example.gif">
+    <img width=750 src="imgs/extralinks.png">
 </div>
 
 ------------------------------------------------------------------
+
+Different types of **link connections** and **geometry awareness**.
+
+<div align="center">
+    <img width=250 src="imgs/curved.png">
+    <img width=250 src="imgs/manhattan.png">
+    <img width=250 src="imgs/subway.png">
+</div>
+
+<div align="center">
+    <img width=750 src="imgs/geometry_awareness_sample.gif">
+</div>
+
+
 
 ## Requirements
 
@@ -60,7 +69,7 @@ Restart ComfyUI.
 Open **Settings** → **Extra Links** and configure:
 
 - **Enable**: toggle on/off
-- **Shape**: `Curved` | `Rounded`
+- **Shape**: `Curved` | `Manhattan` | `Subway`
 - **Radius**: corner smoothing
 - **Offset**: horizontal separation for multi-outputs
 - **Curvature**: strength of turn-in/out
@@ -102,7 +111,10 @@ If issues persist, please open an issue with:
 
 ## Versioning & Releases
 
-- **1.0.0** — Migration to new ComfyUI link renderer (**breaking**: drops < 1.27.1).
+- **1.1.0** - Added subway style and geometry awareness.
+- **1.0.2** - Fixed path method to patch each instance.
+- **1.0.1** - Fixed links lookup.
+- **1.0.0** - Migration to new ComfyUI link renderer (**breaking**: drops < 1.27.1).
 
 > See [`CHANGELOG`](CHANGELOG.md) for details.
 
