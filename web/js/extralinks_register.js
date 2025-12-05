@@ -79,7 +79,7 @@ app.registerExtension({
             name: "Shape",
             type: "combo",
             options: [{text: "Curved", value: "curved"},
-                      {text: "Rounded", value: "rounded"},
+                      {text: "Manhattan", value: "manhattan"},
                       {text: "Subway", value: "subway"}],
             defaultValue: "curved",
             category: ["Extra Links", "General", "Shape"],
