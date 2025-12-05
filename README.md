@@ -12,15 +12,24 @@ A one-click collection of alternate connection styles for ComfyUI.
 ------------------------------------------------------------------
 
 <div align="center">
-    <img width=400 height=190 src="imgs/curved.png">
-    <img width=400 height=190 src="imgs/rounded.png">
-</div>
-
-<div align="center">
-    <img width=800 src="imgs/extralinks_example.gif">
+    <img width=900 src="imgs/extralinks.png">
 </div>
 
 ------------------------------------------------------------------
+
+Different types of **link connections** and **geometry awareness**.
+
+<div align="center">
+    <img width=300 src="imgs/curved.png">
+    <img width=300 src="imgs/manhattan.png">
+    <img width=300 src="imgs/subway.png">
+</div>
+
+<div align="center">
+    <img width=900 src="imgs/geometry_awareness_sample.gif">
+</div>
+
+
 
 ## Requirements
 
