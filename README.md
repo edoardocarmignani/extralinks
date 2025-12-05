@@ -60,7 +60,7 @@ Restart ComfyUI.
 Open **Settings** → **Extra Links** and configure:
 
 - **Enable**: toggle on/off
-- **Shape**: `Curved` | `Rounded`
+- **Shape**: `Curved` | `Manhattan` | `Subway`
 - **Radius**: corner smoothing
 - **Offset**: horizontal separation for multi-outputs
 - **Curvature**: strength of turn-in/out
@@ -102,7 +102,10 @@ If issues persist, please open an issue with:
 
 ## Versioning & Releases
 
-- **1.0.0** — Migration to new ComfyUI link renderer (**breaking**: drops < 1.27.1).
+- **1.1.0** - Added subway style and geometry awareness.
+- **1.0.2** - Fixed path method to patch each instance.
+- **1.0.1** - Fixed links lookup.
+- **1.0.0** - Migration to new ComfyUI link renderer (**breaking**: drops < 1.27.1).
 
 > See [`CHANGELOG`](CHANGELOG.md) for details.
 
