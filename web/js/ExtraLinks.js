@@ -230,6 +230,7 @@ export class ExtraLinks {
             ctx.fillStyle = ctx.strokeStyle = color2;
 
             const pos = [0, 0];
+            const pos = [0, 0, 0];
 
             const renderer = LinkRenderers[SHAPE] || LinkRenderers.curved;
 
@@ -250,7 +251,12 @@ export class ExtraLinks {
             ctx.stroke(path);
 
             pathRendererConstructor.prototype.calculateCenterPoint = (...args) => {
-                return link2.centerPos = {x: pos[0], y: pos[1]}
+                link2.centerPos = {x: pos[0], y: pos[1]}
+                if (context.style.centerMarkerShape === 'arrow') {
+                    link2.centerAngle = pos[2];
+                }
+
+                return link2.centerPos
             }
         }
     }
