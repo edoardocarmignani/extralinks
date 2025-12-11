@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [1.1.1] - 2025-12-11
+
+### Fixed
+
+- Add a check for collapsed state. If collapsed use the default value `30` as height.
+
+---
+
 ## [1.1.0] - 2025-11-25
 
 ### Added

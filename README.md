@@ -111,6 +111,7 @@ If issues persist, please open an issue with:
 
 ## Versioning & Releases
 
+- **1.1.1** - Fixed collapsed state node links.
 - **1.1.0** - Added subway style and geometry awareness.
 - **1.0.2** - Fixed path method to patch each instance.
 - **1.0.1** - Fixed links lookup.
