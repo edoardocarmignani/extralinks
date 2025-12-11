@@ -50,7 +50,9 @@ const LinkRenderers = {
                     path.lineTo(x2, y2);
                     return;
                 }
-                const sourceBottom = start_node.pos[1] + start_node.size[1];
+
+                const nodeHeight = start_node.collapsed ? start_node.height / 2 : start_node.size[1];
+                const sourceBottom = start_node.collapsed ? start_node.pos[1] - (nodeHeight - offset) / 2 : nodeHeight + start_node.pos[1];
                 const sourceLeft = (start_node.pos[1] + start_node.size[1] < y2) ? start_node.pos[0] + start_node.size[0] : start_node.pos[0] + 10;
 
                 const trayY = sourceBottom + ((slot_id + 1) * offset / 2);
@@ -114,7 +116,8 @@ const LinkRenderers = {
                     return;
                 }
 
-                const sourceBottom = start_node.pos[1] + start_node.size[1];
+                const nodeHeight = start_node.collapsed ? start_node.height / 2 : start_node.size[1];
+                const sourceBottom = start_node.collapsed ? start_node.pos[1] - (nodeHeight - offset) / 2 : nodeHeight + start_node.pos[1];
                 const sourceLeft = (start_node.pos[1] + start_node.size[1] < y2) ? start_node.pos[0] + start_node.size[0] : start_node.pos[0] + 10;
 
                 const trayY = sourceBottom + ((slot_id + 1) * offset / 2);
@@ -184,9 +187,9 @@ const LinkRenderers = {
                     pos[2] = Math.atan2(dy, dx);
                     return;
                 }
-
-                const sourceBottom = start_node.pos[1] + start_node.size[1];
-                const sourceLeft = (start_node.pos[1] + start_node.size[1] < y2) ? start_node.pos[0] + start_node.size[0]: start_node.pos[0] + 10;
+                const nodeHeight = start_node.collapsed ? start_node.height / 2 : start_node.size[1];
+                const sourceBottom = start_node.collapsed ? start_node.pos[1] - (nodeHeight - offset) / 2 : nodeHeight + start_node.pos[1];
+                const sourceLeft = (start_node.pos[1] + nodeHeight < y2) ? start_node.pos[0] + start_node.size[0]: start_node.pos[0] + 10;
 
                 const trayY = sourceBottom + ((slot_id + 1) * offset / 2);
                 let turnX2 = x2 - offset;
@@ -253,6 +256,9 @@ export class ExtraLinks {
 
             const start_node = app.graph.getNodeById(full_link_object?.origin_id);
             const end_node = app.graph.getNodeById(full_link_object?.target_id);
+
+            console.log(start_node)
+            // console.log(end_node)
 
             const is_dragging = (link2?.id == 'temp') || !app.graph.links[link2.id];
 
