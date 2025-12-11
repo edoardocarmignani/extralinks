@@ -47,7 +47,7 @@ app.registerExtension({
         },
         {
             id: "Extra Links.ExtraLinks",
-            name: "Version 1.1.0",
+            name: "Version 1.1.1",
             type: () => {
                 const container = document.createElement("span");
                 const btn = document.createElement("button");
