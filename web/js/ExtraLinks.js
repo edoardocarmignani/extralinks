@@ -1,8 +1,8 @@
-import {app} from "../../../scripts/app.js"
+import { app } from "../../../scripts/app.js"
 
 const LinkRenderers = {
     curved: {
-        draw: function(path, start, end, slot_id, start_node, end_node, radius, offset, curvature, pos, is_dragging) {
+        draw: function (path, start, end, slot_id, start_node, end_node, radius, offset, curvature, pos, is_dragging) {
 
             const outputs = start_node?.outputs.length ?? 1;
 
@@ -32,7 +32,7 @@ const LinkRenderers = {
                 path.arcTo(x1, y2, x1 + r * dirX, y2, r);
                 path.lineTo(x2, y2);
 
-                if ( Math.abs(x2 - x1) > Math.abs(y2 - y1) ) {
+                if (Math.abs(x2 - x1) > Math.abs(y2 - y1)) {
                     pos[0] = (x2 + x1) * 0.5;
                     pos[1] = y2;
                     pos[2] = Math.atan2(0, x2 - x1)
@@ -42,7 +42,7 @@ const LinkRenderers = {
                     pos[2] = Math.atan2(y2 - y1, 0)
                 }
             } else {
-                if (is_dragging && !start_node) {
+                if (is_dragging || !start_node) {
                     path.lineTo(x1 - r * dirX, y1);
                     path.arcTo(x1, y1, x1, y1 + r * dirY, r);
                     path.lineTo(x1, y2 - r * dirY);
@@ -77,7 +77,7 @@ const LinkRenderers = {
         }
     },
     manhattan: {
-        draw: function(path, start, end, slot_id, start_node, end_node, radius, offset, curvature, pos, is_dragging) {
+        draw: function (path, start, end, slot_id, start_node, end_node, radius, offset, curvature, pos, is_dragging) {
 
             const x0 = start.x;
             const y1 = start.y;
@@ -107,7 +107,7 @@ const LinkRenderers = {
                 pos[1] = (y1 + y2) * 0.5;
                 pos[2] = Math.atan2(dy, (Math.abs(dy) < radius * 2) ? (Math.PI + radius) * 0.5 : 0);
             } else {
-                if (is_dragging && !start_node) {
+                if (is_dragging || !start_node) {
                     const midX = (x0 + x2) * 0.5;
 
                     path.arcTo(midX, y1, midX, y2, r);
@@ -142,7 +142,8 @@ const LinkRenderers = {
         }
     },
     subway: {
-        draw: function(path, start, end, slot_id, start_node, end_node, radius, offset, curvature, pos, is_dragging) {
+        draw: function (path, start, end, slot_id, start_node, end_node, radius, offset, curvature, pos, is_dragging) {
+
             const x0 = start.x;
             const y0 = start.y;
             const x2 = end.x;
@@ -176,7 +177,7 @@ const LinkRenderers = {
                 pos[2] = Math.atan2(y2 - y0, (Math.abs(dy) < r * 2) ? (Math.PI + c2 - c1) : c2 - c1);
             } else {
 
-                if (is_dragging && !start_node) {
+                if (is_dragging || !start_node) {
 
                     path.arcTo(turnX1, y0, turnX1, y2, r);
                     path.arcTo(turnX1, y2, x2, y2, r);
@@ -187,9 +188,10 @@ const LinkRenderers = {
                     pos[2] = Math.atan2(dy, dx);
                     return;
                 }
+
                 const nodeHeight = start_node.collapsed ? start_node.height / 2 : start_node.size[1];
                 const sourceBottom = start_node.collapsed ? start_node.pos[1] - (nodeHeight - offset) / 2 : nodeHeight + start_node.pos[1];
-                const sourceLeft = (start_node.pos[1] + nodeHeight < y2) ? start_node.pos[0] + start_node.size[0]: start_node.pos[0] + 10;
+                const sourceLeft = (start_node.pos[1] + nodeHeight < y2) ? start_node.pos[0] + start_node.size[0] : start_node.pos[0] + 10;
 
                 const trayY = sourceBottom + ((slot_id + 1) * offset / 2);
                 let turnX2 = x2 - offset;
@@ -223,9 +225,9 @@ export class ExtraLinks {
 
     async waitForCanvas() {
         while (!app.canvas ||
-               !app.canvas.linkRenderer ||
-               !app.canvas.linkRenderer.pathRenderer ||
-               !app.canvas.linkRenderer.pathRenderer.drawLink) {
+            !app.canvas.linkRenderer ||
+            !app.canvas.linkRenderer.pathRenderer ||
+            !app.canvas.linkRenderer.pathRenderer.drawLink) {
             await new Promise(resolve => setTimeout(resolve, 100));
         }
         return true;
@@ -246,21 +248,20 @@ export class ExtraLinks {
                 return;
             }
 
-            const RADIUS    = app.extensionManager.setting.get("Extra Links.Shapes.Radius") ?? 10;
-            const OFFSET    = app.extensionManager.setting.get("Extra Links.Shapes.Offset") ?? 25;
+            const _graph = app.canvas.graph;
+
+            const RADIUS = app.extensionManager.setting.get("Extra Links.Shapes.Radius") ?? 10;
+            const OFFSET = app.extensionManager.setting.get("Extra Links.Shapes.Offset") ?? 25;
             const CURVATURE = app.extensionManager.setting.get("Extra Links.Shapes.Curvature") ?? 5;
             const SHAPE = app.extensionManager.setting.get("Extra Links.General.Shape") ?? "curved";
 
-            const full_link_object = app.graph.links[link2?.id];
+            const full_link_object = _graph.links[link2?.id];
             const outputId = full_link_object?.origin_slot ?? 0;
 
-            const start_node = app.graph.getNodeById(full_link_object?.origin_id);
-            const end_node = app.graph.getNodeById(full_link_object?.target_id);
+            const start_node = _graph.getNodeById(full_link_object?.origin_id);
+            const end_node = _graph.getNodeById(full_link_object?.target_id);
 
-            console.log(start_node)
-            // console.log(end_node)
-
-            const is_dragging = (link2?.id == 'temp') || !app.graph.links[link2.id];
+            const is_dragging = (link2?.id == 'temp') || !_graph.links[link2.id];
 
             const startPos = link2.startPoint;
             const endPos = link2.endPoint;
@@ -290,7 +291,7 @@ export class ExtraLinks {
             ctx.stroke(path);
 
             pathRendererConstructor.prototype.calculateCenterPoint = (...args) => {
-                link2.centerPos = {x: pos[0], y: pos[1]}
+                link2.centerPos = { x: pos[0], y: pos[1] }
                 if (context.style.centerMarkerShape === 'arrow') {
                     link2.centerAngle = pos[2];
                 }

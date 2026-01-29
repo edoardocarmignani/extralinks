@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [1.1.2] - 2026-01-19
+
+### Fixed
+
+- Change node retrieval logic to call `app.canvas.graph` instead of `app.graph` in order to make links behave correctly inside subgraphs.
+- Change conditional `is_dragging && !start_node` to `is_dragging || !start_node` to solve subgraphs input issues.
+
+---
+
+---
+
 ## [1.1.1] - 2025-12-11
 
 ### Fixed
