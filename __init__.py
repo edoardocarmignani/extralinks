@@ -8,7 +8,7 @@
 
 __author__ = 'Edoardo Carmignani'
 __email__ = 'edoardo.carmignani@gmail.com'
-__version__ = '1.1.2'
+__version__ = '1.2.0'
 
 WEB_DIRECTORY = './web'
 

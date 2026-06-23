@@ -17,7 +17,7 @@ A one-click collection of alternate connection styles for ComfyUI.
 
 ------------------------------------------------------------------
 
-Different types of **link connections** and **geometry awareness**.
+Different types of **link connections**, **geometry awareness**, and routed **Trace** links.
 
 <div align="center">
     <img width=250 src="imgs/curved.png">
@@ -69,12 +69,16 @@ Restart ComfyUI.
 Open **Settings** → **Extra Links** and configure:
 
 - **Enable**: toggle on/off
-- **Shape**: `Curved` | `Manhattan` | `Subway`
+- **Shape**: `Curved` | `Manhattan` | `Subway` | `Trace`
 - **Radius**: corner smoothing
 - **Offset**: horizontal separation for multi-outputs
 - **Curvature**: strength of turn-in/out
 
 Changes apply immediately to the canvas.
+
+### Trace
+
+`Trace` routes links with mostly 90° and 45° segments, rounded corners, and node-aware obstacle routing. It avoids the center marker used by the other link styles.
 
 ------------------------------------------------------------------
 
@@ -111,6 +115,7 @@ If issues persist, please open an issue with:
 
 ## Versioning & Releases
 
+- **1.2.0** - Added Trace mode with node-aware 90°/45° routing.
 - **1.1.2** - Fixed links inside subgraphs.
 - **1.1.1** - Fixed collapsed state node links.
 - **1.1.0** - Added subway style and geometry awareness.
@@ -129,8 +134,10 @@ Tags:
 
 ## Development
 
-- Main code lives in `extralinks/web/ExtraLinks.js`
-- Settings/registration live in `extralinks/web/extralinks_register.js`
+- Main code lives in `extralinks/web/js/ExtraLinks.js`
+- Trace routing lives in `extralinks/web/js/Trace.js`
+- Node bbox indexing lives in `extralinks/web/js/NodeBBoxIndex.js`
+- Settings/registration live in `extralinks/web/js/extralinks_register.js`
 - Python exposes `WEB_DIRECTORY` via `extralinks/__init__.py`
 
 Typical flow:
@@ -161,4 +168,5 @@ MIT (see [`LICENSE`](LICENSE))
 ## Credits
 
 - Built by [@edoardocarmignani](https://github.com/edoardocarmignani)
+- Trace routing is adapted from [quick-connections](https://github.com/niknah/quick-connections) by [@niknah](https://github.com/niknah)
 - Thanks to the ComfyUI community for the incredible work

@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [1.2.0] - 2026-06-23
+
+### Added
+
+- Added **Trace** link style with node-aware routing, 90°/45° path constraints, rounded corners, and no center marker.
+- Added a node bbox spatial index to reduce routing intersection checks on large graphs.
+
+### Changed
+
+- Implemented Trace in `web/js/Trace.js` with bbox indexing in `web/js/NodeBBoxIndex.js`.
+- Improved custom link rendering for backward links and collapsed-node layouts.
+- Added attribution for routing logic adapted from `quick-connections`.
+
+---
+
 ## [1.1.2] - 2026-01-19
 
 ### Fixed
