@@ -29,7 +29,9 @@ Different types of **link connections**, **geometry awareness**, and routed **Tr
     <img width=750 src="imgs/geometry_awareness_sample.gif">
 </div>
 
-
+<div align="center">
+    <img width=750 src="imgs/trace.png">
+</div>
 
 ## Requirements
 
