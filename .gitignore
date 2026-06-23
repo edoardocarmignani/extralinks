@@ -101,3 +101,5 @@ cookiecutter-pypackage-env/
 *.code-workspace
 
 node.zip
+
+.claude/
