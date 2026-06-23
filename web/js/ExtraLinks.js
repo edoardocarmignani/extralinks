@@ -1,4 +1,15 @@
 import { app } from "../../../scripts/app.js"
+import { traceRenderer } from "./Trace.js"
+
+function _getGraphLink(graph, linkId) {
+    return graph?.getLink?.(linkId)
+        ?? graph?.getLink?.(Number(linkId))
+        ?? graph?.links?.[linkId]
+        ?? graph?.links?.[String(linkId)]
+        ?? graph?.links?.get?.(linkId)
+        ?? graph?.links?.get?.(Number(linkId))
+        ?? null;
+}
 
 const LinkRenderers = {
     curved: {
@@ -21,7 +32,7 @@ const LinkRenderers = {
             const oX = Math.min(offsetX, (dx * 0.5))
             const x1 = x0 + oX;
 
-            const r = Math.min(radius, Math.abs(dx * 0.5), Math.abs(dy * 0.5), Math.abs(x0 - x1));
+            const r = dx > 0 ? Math.min(radius, Math.abs(dx * 0.5), Math.abs(dy * 0.5), Math.abs(x0 - x1)) : radius;
 
             path.moveTo(x0, y1);
 
@@ -51,11 +62,11 @@ const LinkRenderers = {
                     return;
                 }
 
-                const nodeHeight = start_node.collapsed ? start_node.height / 2 : start_node.size[1];
-                const sourceBottom = start_node.collapsed ? start_node.pos[1] - (nodeHeight - offset) / 2 : nodeHeight + start_node.pos[1];
-                const sourceLeft = (start_node.pos[1] + start_node.size[1] < y2) ? start_node.pos[0] + start_node.size[0] : start_node.pos[0] + 10;
+                const sourceBottom = start_node.collapsed ? y1 + offset / 2 : start_node.pos[1] + start_node.size[1];
+                const targetBottom = end_node ? (end_node.collapsed ? y2 + offset / 2 : end_node.pos[1] + end_node.size[1]) : sourceBottom;
+                const sourceLeft = (sourceBottom < y2) ? start_node.pos[0] + start_node.size[0] : start_node.pos[0] + 10;
 
-                const trayY = sourceBottom + ((slot_id + 1) * offset / 2);
+                const trayY = Math.max(y1, Math.max(sourceBottom, targetBottom) + ((slot_id + 1) * offset / 2));
 
                 const turnX1 = x0 + offset;
                 let turnX2 = x2 - offset;
@@ -64,10 +75,13 @@ const LinkRenderers = {
                     turnX2 = sourceLeft - offset;
                 }
 
-                path.arcTo(turnX1, y1, turnX1, trayY, r);
-                path.arcTo(turnX1, trayY, turnX2, trayY, r);
-                path.arcTo(turnX2, trayY, turnX2, y2, r);
-                path.arcTo(turnX2, y2, x2, y2, r);
+                const r12 = Math.min(r, (trayY - y1) / 2);
+                const r34 = Math.min(r, Math.abs(y2 - trayY) / 2);
+
+                path.arcTo(turnX1, y1, turnX1, trayY, r12);
+                path.arcTo(turnX1, trayY, turnX2, trayY, r12);
+                path.arcTo(turnX2, trayY, turnX2, y2, r34);
+                path.arcTo(turnX2, y2, x2, y2, r34);
                 path.lineTo(x2, y2);
 
                 pos[0] = (x2 > sourceLeft) ? (turnX2 + turnX1) / 2 : (x0 + x2) / 2;
@@ -91,7 +105,7 @@ const LinkRenderers = {
             const dirX = Math.sign(dx);
             const limitedOffset = offset * (outputs > 1 ? Math.log(outputs) : 1);
             const fanOffset = Math.max((limitedOffset - slot_id * curvature) * dirX, 0);
-            const r = Math.min(radius, Math.abs(dx) * 0.5, Math.abs(dy) * 0.5);
+            const r = dx > 0 ? Math.min(radius, Math.abs(dx) * 0.5, Math.abs(dy) * 0.5) : radius;
 
             path.moveTo(x0, y1);
 
@@ -116,11 +130,11 @@ const LinkRenderers = {
                     return;
                 }
 
-                const nodeHeight = start_node.collapsed ? start_node.height / 2 : start_node.size[1];
-                const sourceBottom = start_node.collapsed ? start_node.pos[1] - (nodeHeight - offset) / 2 : nodeHeight + start_node.pos[1];
-                const sourceLeft = (start_node.pos[1] + start_node.size[1] < y2) ? start_node.pos[0] + start_node.size[0] : start_node.pos[0] + 10;
+                const sourceBottom = start_node.collapsed ? y1 + offset / 2 : start_node.pos[1] + start_node.size[1];
+                const targetBottom = end_node ? (end_node.collapsed ? y2 + offset / 2 : end_node.pos[1] + end_node.size[1]) : sourceBottom;
+                const sourceLeft = (sourceBottom < y2) ? start_node.pos[0] + start_node.size[0] : start_node.pos[0] + 10;
 
-                const trayY = sourceBottom + ((slot_id + 1) * offset / 2);
+                const trayY = Math.max(y1, Math.max(sourceBottom, targetBottom) + ((slot_id + 1) * offset / 2));
 
                 const turnX1 = x0 + offset;
                 let turnX2 = x2 - offset;
@@ -129,10 +143,13 @@ const LinkRenderers = {
                     turnX2 = sourceLeft - offset;
                 }
 
-                path.arcTo(turnX1, y1, turnX1, trayY, r);
-                path.arcTo(turnX1, trayY, turnX2, trayY, r);
-                path.arcTo(turnX2, trayY, turnX2, y2, r);
-                path.arcTo(turnX2, y2, x2, y2, r);
+                const r12 = Math.min(r, (trayY - y1) / 2);
+                const r34 = Math.min(r, Math.abs(y2 - trayY) / 2);
+
+                path.arcTo(turnX1, y1, turnX1, trayY, r12);
+                path.arcTo(turnX1, trayY, turnX2, trayY, r12);
+                path.arcTo(turnX2, trayY, turnX2, y2, r34);
+                path.arcTo(turnX2, y2, x2, y2, r34);
                 path.lineTo(x2, y2);
 
                 pos[0] = (x2 > sourceLeft) ? (turnX2 + turnX1) / 2 : (x0 + x2) / 2;
@@ -152,7 +169,7 @@ const LinkRenderers = {
             const dx = x2 - x0;
             const dy = y2 - y0;
 
-            const r = Math.min(radius, offset, Math.abs(dx), Math.abs(dy));
+            const r = dx > 0 ? Math.min(radius, offset, Math.abs(dx), Math.abs(dy)) : radius;
 
             const midX = (x0 + x2) * 0.5;
             const hspace = (dx * 0.5);
@@ -189,21 +206,24 @@ const LinkRenderers = {
                     return;
                 }
 
-                const nodeHeight = start_node.collapsed ? start_node.height / 2 : start_node.size[1];
-                const sourceBottom = start_node.collapsed ? start_node.pos[1] - (nodeHeight - offset) / 2 : nodeHeight + start_node.pos[1];
-                const sourceLeft = (start_node.pos[1] + nodeHeight < y2) ? start_node.pos[0] + start_node.size[0] : start_node.pos[0] + 10;
+                const sourceBottom = start_node.collapsed ? y0 + offset / 2 : start_node.pos[1] + start_node.size[1];
+                const targetBottom = end_node ? (end_node.collapsed ? y2 + offset / 2 : end_node.pos[1] + end_node.size[1]) : sourceBottom;
+                const sourceLeft = (sourceBottom < y2) ? start_node.pos[0] + start_node.size[0] : start_node.pos[0] + 10;
 
-                const trayY = sourceBottom + ((slot_id + 1) * offset / 2);
+                const trayY = Math.max(y0, Math.max(sourceBottom, targetBottom) + ((slot_id + 1) * offset / 2));
                 let turnX2 = x2 - offset;
 
                 if (Math.floor(x2) > Math.floor(sourceLeft)) {
                     turnX2 = sourceLeft - offset;
                 }
 
-                path.arcTo(turnX1, y0, turnX1, trayY, r);
-                path.arcTo(turnX1, trayY, turnX2, trayY, r);
-                path.arcTo(turnX2, trayY, turnX2, y2, r);
-                path.arcTo(turnX2, y2, x2, y2, r);
+                const r12 = Math.min(r, (trayY - y0) / 2);
+                const r34 = Math.min(r, Math.abs(y2 - trayY) / 2);
+
+                path.arcTo(turnX1, y0, turnX1, trayY, r12);
+                path.arcTo(turnX1, trayY, turnX2, trayY, r12);
+                path.arcTo(turnX2, trayY, turnX2, y2, r34);
+                path.arcTo(turnX2, y2, x2, y2, r34);
                 path.lineTo(x2, y2);
 
                 pos[0] = (x2 > sourceLeft) ? (turnX2 + x0 + offset) / 2 : (x0 + x2) / 2;
@@ -212,6 +232,7 @@ const LinkRenderers = {
             }
         }
     },
+    trace: traceRenderer,
 };
 
 export class ExtraLinks {
@@ -245,7 +266,7 @@ export class ExtraLinks {
             if (!app.extensionManager.setting.get("Extra Links.General.Enable")) {
                 pathRendererConstructor.prototype.drawLinkPath = _originalDrawLinkPath;
                 pathRendererConstructor.prototype.calculateCenterPoint = _originalCalculateCenterPoint;
-                return;
+                return _originalDrawLinkPath.call(this, ctx, path, link2, context, lineWidth, color2);
             }
 
             const _graph = app.canvas.graph;
@@ -255,13 +276,13 @@ export class ExtraLinks {
             const CURVATURE = app.extensionManager.setting.get("Extra Links.Shapes.Curvature") ?? 5;
             const SHAPE = app.extensionManager.setting.get("Extra Links.General.Shape") ?? "curved";
 
-            const full_link_object = _graph.links[link2?.id];
+            const full_link_object = _getGraphLink(_graph, link2?.id);
             const outputId = full_link_object?.origin_slot ?? 0;
 
             const start_node = _graph.getNodeById(full_link_object?.origin_id);
             const end_node = _graph.getNodeById(full_link_object?.target_id);
 
-            const is_dragging = (link2?.id == 'temp') || !_graph.links[link2.id];
+            const is_dragging = (link2?.id == 'temp') || !full_link_object;
 
             const startPos = link2.startPoint;
             const endPos = link2.endPoint;
@@ -273,6 +294,10 @@ export class ExtraLinks {
             const pos = [0, 0, 0];
 
             const renderer = LinkRenderers[SHAPE] || LinkRenderers.curved;
+
+            const _linkId = link2?.id ?? null;
+            const _isStale = _linkId != null && !full_link_object && !is_dragging;
+            traceRenderer.prepare(_linkId, _graph, _isStale);
 
             renderer.draw(
                 path,
@@ -291,6 +316,12 @@ export class ExtraLinks {
             ctx.stroke(path);
 
             pathRendererConstructor.prototype.calculateCenterPoint = (...args) => {
+                if (SHAPE === "trace") {
+                    delete link2.centerPos;
+                    delete link2.centerAngle;
+                    return null;
+                }
+
                 link2.centerPos = { x: pos[0], y: pos[1] }
                 if (context.style.centerMarkerShape === 'arrow') {
                     link2.centerAngle = pos[2];

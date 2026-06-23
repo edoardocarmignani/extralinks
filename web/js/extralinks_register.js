@@ -47,7 +47,7 @@ app.registerExtension({
         },
         {
             id: "Extra Links.ExtraLinks",
-            name: "Version 1.1.2",
+            name: "Version 1.2.0",
             type: () => {
                 const container = document.createElement("span");
                 const btn = document.createElement("button");
@@ -80,7 +80,8 @@ app.registerExtension({
             type: "combo",
             options: [{text: "Curved", value: "curved"},
                       {text: "Manhattan", value: "manhattan"},
-                      {text: "Subway", value: "subway"}],
+                      {text: "Subway", value: "subway"},
+                      {text: "Trace", value: "trace"}],
             defaultValue: "curved",
             category: ["Extra Links", "General", "Shape"],
             onChange: (val) => {
