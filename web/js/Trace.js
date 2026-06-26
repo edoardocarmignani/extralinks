@@ -313,46 +313,47 @@ class MapLinks {
 			},
 			{},
 		);
-		this.nodesByRight.filter((nodeI) => {
+		for (const nodeI of this.nodesByRight) {
 			const { node } = nodeI;
 			const outputs = node.outputs;
 			if (!outputs) {
-				return false;
+				continue;
 			}
-			outputs.filter((output, slot) => {
+			for (let slot = 0; slot < outputs.length; slot++) {
+				const output = outputs[slot];
 				const links = output.links;
 				if (!links) {
-					return false;
+					continue;
 				}
 
 				const outputXYConnection = _getSlotPosition(node, slot, false);
 				if (!outputXYConnection) {
-					return false;
+					continue;
 				}
 				const outputNodeInfo = this.nodesById[node.id];
 				let outputXY = Array.from(outputXYConnection);
-				links.filter((linkId) => {
+				for (const linkId of links) {
 					outputXY[0] = outputNodeInfo.linesArea[2];
 					const link = _getGraphLink(graphLinks, linkId);
 					if (!link) {
-						return false;
+						continue;
 					}
 					let targetNode = this.canvas.graph.getNodeById(link.target_id);
 					if (!targetNode) {
 						targetNode = nodesByRightId[link.target_id];
 					}
 					if (!targetNode) {
-						return false;
+						continue;
 					}
 
 					const inputXYConnection = _getSlotPosition(targetNode, link.target_slot, true);
 					if (!inputXYConnection) {
-						return false;
+						continue;
 					}
 					const inputXY = Array.from(inputXYConnection);
 					const nodeInfo = this.nodesById[targetNode.id];
 					if (!nodeInfo) {
-						return false;
+						continue;
 					}
 					inputXY[0] = nodeInfo.linesArea[0] - 1;
 
@@ -394,12 +395,9 @@ class MapLinks {
 						outputXY[0] + this.config.lineSpace,
 						outputXY[1],
 					];
-					return false;
-				});
-				return false;
-			});
-			return false;
-		});
+				}
+			}
+		}
 	}
 
 }
@@ -616,6 +614,16 @@ function _path90Or45(from, to) {
 	const dy = to[1] - from[1];
 	const absDx = Math.abs(dx);
 	const absDy = Math.abs(dy);
+	const axisSnapEpsilon = 8;
+
+	if (absDy <= axisSnapEpsilon) {
+		const mid = [to[0], from[1]];
+		return _samePoint(mid, to) ? [from, to] : [from, mid, to];
+	}
+	if (absDx <= axisSnapEpsilon) {
+		const mid = [from[0], to[1]];
+		return _samePoint(mid, to) ? [from, to] : [from, mid, to];
+	}
 
 	if (dx === 0 || dy === 0 || Math.abs(absDx - absDy) < 0.001) {
 		return [from, to];
@@ -646,44 +654,125 @@ function _normalizeRoute90Or45(points) {
 	return route;
 }
 
+function _routeWithLiveEndpoints(route, start, end) {
+	const points = [[start.x, start.y]];
+	for (let i = 1; i < route.length - 1; i++) {
+		const point = route[i];
+		points.push([point[0], point[1]]);
+	}
+	points.push([end.x, end.y]);
+
+	if (points.length > 2) {
+		points[1][1] = start.y;
+		points[points.length - 2][1] = end.y;
+	}
+
+	return points;
+}
+
 const _traceRoutes = new TraceRoutes();
 
 let _lastGraph = null;
-let _lastHash = null;
+let _lastSignature = null;
+let _checkedGraphThisTask = null;
+let _resetCheckScheduled = false;
 
-function _graphHash(graph) {
-	if (!graph) {
-		return "";
-	}
+function _mixHash(hash, value) {
+	hash ^= value >>> 0;
+	return Math.imul(hash, 16777619) >>> 0;
+}
 
-	let hash = "";
-	const nodes = graph._nodes || [];
-	for (let i = 0; i < nodes.length; i++) {
-		const node = nodes[i];
-		hash += `${node.id}:${node.pos?.[0]},${node.pos?.[1]},${node.size?.[0]},${node.size?.[1]};`;
-	}
-	const links = graph.links || {};
-	const linkIds = Object.keys(links).sort();
-	for (let i = 0; i < linkIds.length; i++) {
-		const link = links[linkIds[i]];
-		hash += `link:${linkIds[i]},${link?.origin_id},${link?.origin_slot},${link?.target_id},${link?.target_slot};`;
+function _mixString(hash, value) {
+	const text = String(value ?? "");
+	for (let i = 0; i < text.length; i++) {
+		hash = _mixHash(hash, text.charCodeAt(i));
 	}
 	return hash;
 }
 
-function _ensureTraceRoutes(graph) {
+function _mixCoord(hash, value) {
+	const num = Number.isFinite(value) ? Math.round(value * 1000) : 0;
+	return _mixHash(hash, num);
+}
+
+function _iterateLinks(graphLinks, callback) {
+	if (!graphLinks) {
+		return;
+	}
+	if (typeof graphLinks.forEach === "function") {
+		graphLinks.forEach((link, id) => callback(id, link));
+		return;
+	}
+
+	const linkIds = Object.keys(graphLinks);
+	for (let i = 0; i < linkIds.length; i++) {
+		const id = linkIds[i];
+		callback(id, graphLinks[id]);
+	}
+}
+
+function _graphSignature(graph) {
+	if (!graph) {
+		return 0;
+	}
+
+	let hash = 2166136261;
+	const nodes = graph._nodes || [];
+	hash = _mixHash(hash, nodes.length);
+	for (let i = 0; i < nodes.length; i++) {
+		const node = nodes[i];
+		hash = _mixString(hash, node.id);
+		hash = _mixCoord(hash, node.pos?.[0]);
+		hash = _mixCoord(hash, node.pos?.[1]);
+		hash = _mixCoord(hash, node.size?.[0]);
+		hash = _mixCoord(hash, node.size?.[1]);
+	}
+
+	let linkCount = 0;
+	_iterateLinks(graph.links, (id, link) => {
+		linkCount++;
+		hash = _mixString(hash, id);
+		hash = _mixString(hash, link?.origin_id);
+		hash = _mixHash(hash, link?.origin_slot ?? 0);
+		hash = _mixString(hash, link?.target_id);
+		hash = _mixHash(hash, link?.target_slot ?? 0);
+	});
+	hash = _mixHash(hash, linkCount);
+	return hash;
+}
+
+function _markCheckedThisTask(graph) {
+	_checkedGraphThisTask = graph;
+	if (_resetCheckScheduled) {
+		return;
+	}
+
+	_resetCheckScheduled = true;
+	setTimeout(() => {
+		_checkedGraphThisTask = null;
+		_resetCheckScheduled = false;
+	}, 0);
+}
+
+function _ensureTraceRoutes(graph, isStale = false) {
 	if (!graph) {
 		return;
 	}
 
 	_traceRoutes.graph = graph;
-	const hash = _graphHash(graph);
-	if (_lastGraph === graph && _lastHash === hash && _traceRoutes.mapLinks) {
+	if (!isStale && _checkedGraphThisTask === graph && _traceRoutes.mapLinks) {
+		return;
+	}
+
+	const signature = _graphSignature(graph);
+	_markCheckedThisTask(graph);
+
+	if (!isStale && _lastGraph === graph && _lastSignature === signature && _traceRoutes.mapLinks) {
 		return;
 	}
 
 	_lastGraph = graph;
-	_lastHash = hash;
+	_lastSignature = signature;
 	_traceRoutes.recalcMapLinks();
 }
 
@@ -693,9 +782,10 @@ export const traceRenderer = {
 	prepare(linkId, graph, isStale) {
 		this._linkId = linkId;
 		if (isStale) {
-			_lastHash = null;
+			_lastSignature = null;
+			_checkedGraphThisTask = null;
 		}
-		_ensureTraceRoutes(graph);
+		_ensureTraceRoutes(graph, isStale);
 	},
 
 	draw(path, start, end, slot_id, start_node, end_node, radius, offset, curvature, pos, is_dragging) {
@@ -713,7 +803,7 @@ export const traceRenderer = {
 			return;
 		}
 
-		const fullRoute = _normalizeRoute90Or45([[start.x, start.y], ...route.slice(1, -1), [end.x, end.y]]);
+		const fullRoute = _normalizeRoute90Or45(_routeWithLiveEndpoints(route, start, end));
 		_centerOf(fullRoute, pos);
 		_drawTracePath(path, fullRoute, _traceRoutes.config.lineSpace);
 	},

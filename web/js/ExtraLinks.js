@@ -297,7 +297,9 @@ export class ExtraLinks {
 
             const _linkId = link2?.id ?? null;
             const _isStale = _linkId != null && !full_link_object && !is_dragging;
-            traceRenderer.prepare(_linkId, _graph, _isStale);
+            if (SHAPE === "trace") {
+                traceRenderer.prepare(_linkId, _graph, _isStale);
+            }
 
             renderer.draw(
                 path,
